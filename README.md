@@ -39,14 +39,14 @@ You can pass arguments to the GraphDB server such as the heap size or `-s` for m
 
 Important note from the official Ontotext dockerhub repository: There are several ways to store data used by applications that run in Docker containers. We encourage users of the GraphDB images to familiarize themselves with the options available, including:
 
-	Let Docker manage the storage of your database data by writing the database files to disk on the host system using its own internal volume management. This is the default and is easy and fairly transparent to the user. The downside is that the files may be hard to locate for tools and applications that run directly on the host system, i.e. outside containers.
+* Let Docker manage the storage of your database data by writing the database files to disk on the host system using its own internal volume management. This is the default and is easy and fairly transparent to the user. The downside is that the files may be hard to locate for tools and applications that run directly on the host system, i.e. outside containers.
     
-    Create a data directory on the host system (outside the container) and mount this to a directory visible from inside the container. This places the database files in a known location on the host system, and makes it easy for tools and applications on the host system to access the files. The downside is that the user needs to make sure that the directory exists and that e.g. directory permissions and other security mechanisms on the host system are set up correctly.
+* Create a data directory on the host system (outside the container) and mount this to a directory visible from inside the container. This places the database files in a known location on the host system, and makes it easy for tools and applications on the host system to access the files. The downside is that the user needs to make sure that the directory exists and that e.g. directory permissions and other security mechanisms on the host system are set up correctly.
 
 The Docker documentation is a good starting point for understanding the different storage options and variations, and there are multiple blogs and forum postings that discuss and give advice in this area. We will simply show the basic procedure here for the latter option above:
 
-	1. Create a data directory on a suitable volume on your host system, e.g. /my/own/graphdb-home.
-	2. Start your graphdb container like this: `docker run -p 127.0.0.1:7200:7200 -v /my/own/graphdb-home:/opt/graphdb/data --name graphdb-instance-name -t khaller/graphdb-free:tag`
+1. Create a data directory on a suitable volume on your host system, e.g. /my/own/graphdb-home.
+2. Start your graphdb container like this: `docker run -p 127.0.0.1:7200:7200 -v /my/own/graphdb-home:/opt/graphdb/data --name graphdb-instance-name -t khaller/graphdb-free:tag`
 
 The -v /my/own/graphdb-home:/opt/graphdb/data part of the command mounts the /my/own/graphdb-home directory from the underlying host system as /opt/graphdb/data inside the container, where GraphDB by default will write its data files, logs and working files.
 
