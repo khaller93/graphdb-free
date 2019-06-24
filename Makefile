@@ -1,8 +1,11 @@
-DockerfileVersion=1.0
-LATEST=8.10.0
+DockerfileVersion=1.1
+LATEST=8.10.1
 
 latest:
-	docker build --build-arg GDB_VERSION=${LATEST} -t khaller/graphdb-free:${DockerfileVersion}-graphdb${LATEST} -t khaller/graphdb-free .
+	docker build --build-arg GDB_VERSION=${LATEST} -t khaller/graphdb-free:${DockerfileVersion}-graphdb${LATEST} -t khaller/graphdb-free --no-cache .
+
+8.10.1:
+	docker build --build-arg GDB_VERSION="8.10.1" -t khaller/graphdb-free:${DockerfileVersion}-graphdb8.10.1 .
 
 8.10.0:
 	docker build --build-arg GDB_VERSION="8.10.0" -t khaller/graphdb-free:${DockerfileVersion}-graphdb8.10.0 .
