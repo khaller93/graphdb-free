@@ -1,4 +1,6 @@
 #!/bin/sh
+set -e
+
 if [ -f $1 ]; then
 	if [ ! -z "$2" -a -d $2 ]; then
 		/opt/graphdb/bin/loadrdf $2 -c $1 -m parallel -v -p --force
