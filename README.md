@@ -56,14 +56,13 @@ the repository, into which the data shall be loaded, must be specified by passin
 
 Below you can see an example of running an image that preloads data contained in `./data` into the repository with the id `repository-id`.
 
-` docker run --name graphdb-instance-name -p 127.0.0.1:7200:7200 \
+    docker run --name graphdb-instance-name -p 127.0.0.1:7200:7200 \
 		-e CONF_REPOSITORY_ID="repository-id" \
 		-e CONF_REPOSITORY_LABEL="repository label" \
 		-v ./data":/data/toLoad \
 		-v ./.graphdb:/opt/graphdb/data \
 		-d khaller/graphdb-free:1.2-graphdb8.11.0 \
 		--GDB_HEAP_SIZE="2G"
-`
 
 ## Create fulltext-search index
 
@@ -85,7 +84,7 @@ In order to create a fulltext search index, `CONF_ENABLE_FTS` must be set to `tr
 
 Below you can see the previous example that additionally creates a fulltext search index with the name `esm`.
 
-` docker run --name graphdb-instance-name -p 127.0.0.1:7200:7200 \
+    docker run --name graphdb-instance-name -p 127.0.0.1:7200:7200 \
 		-e CONF_REPOSITORY_ID="repository-id" \
 		-e CONF_REPOSITORY_LABEL="repository label" \
 		-e CONF_ENABLE_FTS="true" \
@@ -94,7 +93,6 @@ Below you can see the previous example that additionally creates a fulltext sear
 		-v ./.graphdb:/opt/graphdb/data \
 		-d khaller/graphdb-free:1.2-graphdb8.11.0 \
 		--GDB_HEAP_SIZE="2G"
-`
 
 # Where to store your data?
 
