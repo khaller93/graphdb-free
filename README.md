@@ -54,7 +54,7 @@ the repository, into which the data shall be loaded, must be specified by passin
 | CONF_READ_ONLY |
 | CONF_THROW_QUERY_EVALUATION_EXCEPTION_ON_TIMEOUT |
 
-See below an example of running an image with preloading data contained in `./data` into the repository with the id `repository-id`.
+Below you can see an example of running an image that preloads data contained in `./data` into the repository with the id `repository-id`.
 
 ` docker run --name graphdb-instance-name -p 127.0.0.1:7200:7200 \
 		-e CONF_REPOSITORY_ID="repository-id" \
@@ -67,7 +67,7 @@ See below an example of running an image with preloading data contained in `./da
 
 ## Create fulltext-search index
 
-In order to create a fulltext search index, `CONF_ENABLE_FTS` must be set to `true` and similar to the repository configuration, the required setting `CONF_FTS_INDEX_NAME` must be specified, while other settings can be set optionally. [GraphDB fulltext index documentation](http://graphdb.ontotext.com/documentation/free/full-text-search.html)
+In order to create a fulltext search index, `CONF_ENABLE_FTS` must be set to `true` and similar to the repository configuration, the required setting `CONF_FTS_INDEX_NAME` must be specified, while other settings can be set optionally. [GraphDB fulltext index documentation](http://graphdb.ontotext.com/documentation/free/full-text-search.html) explains possible settings for the fulltext search index.
 
 | Envorinment variable name |
 |---|
@@ -82,6 +82,8 @@ In order to create a fulltext search index, `CONF_ENABLE_FTS` must be set to `tr
 | CONF_FTS_LANGUAGES |
 | CONF_FTS_MOLECULE_SIZE |
 | CONF_FTS_USE_RDF_RANK |
+
+Below you can see the previous example that additionally creates a fulltext search index with the name `esm`.
 
 ` docker run --name graphdb-instance-name -p 127.0.0.1:7200:7200 \
 		-e CONF_REPOSITORY_ID="repository-id" \
