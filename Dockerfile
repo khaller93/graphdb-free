@@ -1,6 +1,6 @@
 FROM openjdk:8-jre
 
-ARG DFILE_VERSION="1.2"
+ARG DFILE_VERSION="1.2.1"
 ARG GDB_VERSION
 
 LABEL maintainer="Kevin Haller <keivn.haller@outofbits.com>"
