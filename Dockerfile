@@ -1,28 +1,32 @@
+FROM golang:1.13-alpine AS repoInitCompiler
+
+COPY graphdb-repository-init graphdb-repository-init
+WORKDIR graphdb-repository-init
+RUN GOOS=linux go build
+
+RUN mkdir -p /binaries && mv graphdb-repository-init /binaries/graphdb-repository-init
+
+# --------------------
+#   Main Image
+# --------------------
+
 FROM openjdk:8-jre
 
-ARG DFILE_VERSION="1.2.1"
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+
+COPY --from=repoInitCompiler /binaries/graphdb-repository-init /usr/local/bin/graphdb-repository-init
+
+ARG DFILE_VERSION="1.3.0"
 ARG GDB_VERSION
 
 LABEL maintainer="Kevin Haller <keivn.haller@outofbits.com>"
 LABEL version="${DFILE_VERSION}-graphdb${GDB_VERSION}"
 LABEL description="Fresh new instance of GraphDB ${GDB_VERSION} (free version)."
 
-# Install GraphDB
+# install GraphDB
 COPY dist/graphdb-free-${GDB_VERSION}-dist.zip dist/
 RUN unzip -q ./dist/graphdb-free-${GDB_VERSION}-dist.zip && \
-		mkdir -p /opt/graphdb && \
-		mv graphdb-free-${GDB_VERSION}/* /opt/graphdb/
-RUN rm -rf dist
+		mv graphdb-free-${GDB_VERSION} /opt/graphdb && \
+		rm -rf dist
 
-# Install start-up scripts
-COPY "scripts/load-initial-data.sh" load-initial-data.sh
-COPY "scripts/gen-graphdb-config.sh" gen-graphdb-config.sh
-COPY "scripts/init-fulltext-index.sh" init-fulltext-index.sh
-COPY "scripts/gen-graphdb-fts-config.sh" gen-graphdb-fts-config.sh
-COPY "docker-entrypoint.sh" docker-entrypoint.sh
-
-
-ENTRYPOINT ["./docker-entrypoint.sh"]
-CMD ["--GDB_HEAP_SIZE=4G"]
-
-EXPOSE 7200
+ENTRYPOINT ["docker-entrypoint.sh"]
