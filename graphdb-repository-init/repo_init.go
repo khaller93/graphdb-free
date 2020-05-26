@@ -8,6 +8,8 @@ import (
     "path/filepath"
 )
 
+const PreloadTool string = "/opt/graphdb/bin/preload"
+
 // checks whether a file exists at the given path.
 func fExists(name string) bool {
     stat, err := os.Stat(name)
@@ -28,7 +30,7 @@ func dExists(name string) bool {
     }
 }
 
-//
+// initializes the repository configured in the given directory.
 func InitRepository(repositoryDirectory string) {
     fmt.Printf("%s ----- CHECK %s. -----\n", LogPrefix, repositoryDirectory)
     if !fExists(filepath.Join(repositoryDirectory, "init.lock")) {
@@ -48,9 +50,9 @@ func InitRepository(repositoryDirectory string) {
                     fmt.Printf("%s Warning: Could not find data to load for '%s'. 'toLoad' is missing.\n",
                         LogPrefix, repositoryDirectory)
                 }
-                args = append(args, "-c", absConfigPath, "-m", "parallel", "-p", "-v", "--force")
+                args = append(args, "-c", absConfigPath, "-p", "--force")
                 // command execution
-                cmd := exec.Command("/opt/graphdb/bin/loadrdf", args...)
+                cmd := exec.Command(PreloadTool, args...)
                 cmd.Stdout = os.Stdout
                 cmd.Stderr = os.Stderr
                 err := cmd.Run()
