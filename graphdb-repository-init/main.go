@@ -25,7 +25,10 @@ func main() {
             fmt.Printf("%s Detected following repository folders: [%s].\n", LogPrefix,
                 strings.Join(repoFolders, ","))
             for _, repoFolder := range repoFolders {
-                InitRepository(repoFolder)
+                success := InitRepository(repoFolder)
+                if !success {
+                    os.Exit(1)
+                }
             }
         } else {
             fmt.Printf("%s Could not check the subfolders of directory '%s'. %s\n", LogPrefix, directoryPath,
@@ -33,5 +36,6 @@ func main() {
         }
     } else {
         printUsage()
+        os.Exit(1)
     }
 }

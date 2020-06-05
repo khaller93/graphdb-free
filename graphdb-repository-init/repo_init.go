@@ -30,8 +30,9 @@ func dExists(name string) bool {
     }
 }
 
-// initializes the repository configured in the given directory.
-func InitRepository(repositoryDirectory string) {
+// initializes the repository configured in the given directory. returns true,
+// if the repository could be initialized, otherwise false.
+func InitRepository(repositoryDirectory string) bool {
     fmt.Printf("%s ----- CHECK %s. -----\n", LogPrefix, repositoryDirectory)
     if !fExists(filepath.Join(repositoryDirectory, "init.lock")) {
         configPath := filepath.Join(repositoryDirectory, "config.ttl")
@@ -59,8 +60,11 @@ func InitRepository(repositoryDirectory string) {
                 if err == nil {
                     err := ioutil.WriteFile(filepath.Join(repositoryDirectory, "init.lock"), []byte("locked"), 0644)
                     if err != nil {
-                        fmt.Printf("%s Error: %s", LogPrefix, err.Error())
+                        fmt.Printf("%s Error: Failed to write the lock for a new initialization. %s", LogPrefix, err.Error())
                     }
+                    return true
+                } else {
+                    fmt.Printf("%s Error: Execution of preload command failed. %s\n", LogPrefix, err.Error())
                 }
             } else {
                 fmt.Printf("%s Error: Could not find config.ttl for '%s'. %s\n", LogPrefix, repositoryDirectory,
@@ -73,4 +77,5 @@ func InitRepository(repositoryDirectory string) {
     } else {
         fmt.Printf("%s ----- %s. ALREADY INITIALIZED -----\n", LogPrefix, repositoryDirectory)
     }
+    return false
 }

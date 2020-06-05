@@ -16,7 +16,7 @@ COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
 COPY --from=repoInitCompiler /binaries/graphdb-repository-init /usr/local/bin/graphdb-repository-init
 
-ARG DFILE_VERSION="1.3.0"
+ARG DFILE_VERSION="1.3.1"
 ARG GDB_VERSION
 
 LABEL maintainer="Kevin Haller <keivn.haller@outofbits.com>"
