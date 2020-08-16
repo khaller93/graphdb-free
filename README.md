@@ -1,5 +1,4 @@
-Ontotext doesn't provide docker images for the free version of GraphDB. A dockerfile for the free version can be found on their [github](https://github.com/Ontotext-AD/graphdb-docker) although. The Dockerfile in this repository is slightly different. A small program is executed before the start of the GraphDB instance that checks whether repositories shall be
-initialized. A section below is elaborating on this feature.
+Ontotext doesn't provide Docker images for the free version of GraphDB. Although, a Dockerfile for the free version can be found on their [Github](https://github.com/Ontotext-AD/graphdb-docker). The Dockerfile in this repository is slightly different. A small program is executed before the start of the GraphDB instance that checks whether repositories shall be initialized. Moreover, another small program scans for SPARQL queries in the initialization folder and sends them to the GraphDB instance at the first startup. This could be useful for automatically creating a FTS index. Sections below are elaborating on these features.
 
 **PS: Should it be a problem that I publish these docker images, please simply contact me.**
 
@@ -11,24 +10,23 @@ The Dockerfile expects the GraphDB binaries to be located in the `dist` director
 
 ## Building a fresh image
 
-The Dockerfile is simple, it only expects you to pass the version of the GraphDB binaries for which you want to build the image. Download the corresponding binaries, move them into the `dist` directory and build
-the image with the following command (replace 8.11.0 with your version):
+The Dockerfile is simple, it only expects you to pass the version of the GraphDB binaries for which you want to build the image. Download the corresponding binaries, move them into the `dist` directory and build the image with the following command (replace 8.11.0 with your version):
 
-`docker build --build-arg GDB_VERSION="8.11.0" --build-arg -t khaller/graphdb-free:1.3.0-graphdb8.11.0 .`
+`docker build --build-arg GDB_VERSION="9.3.3" --build-arg -t khaller/graphdb-free:1.3.3-graphdb9.3.3 .`
 
 # Running
 
 The image can be run as following. 
 
-`docker run -p 127.0.0.1:7200:7200 --name graphdb-instance-name -t khaller/graphdb-free`
+`docker run -p 127.0.0.1:7200:7200 --name graphdb-instance-name -t khaller/graphdb-free:1.3.3-graphdb9.3.3`
 
 You can pass arguments to the GraphDB server such as the heap size or `-s` for making it run in server mode.
 
-`docker run -p 127.0.0.1:7200:7200 --name graphdb-instance-name -t khaller/graphdb-free -s --GDB_HEAP_SIZE=12G`
+`docker run -p 127.0.0.1:7200:7200 --name graphdb-instance-name -t khaller/graphdb-free:1.3.3-graphdb9.3.3 -s --GDB_HEAP_SIZE=12G`
 
 # Repository Initialization
 
-Multiple repositories can be managed on the same GraphDB instances, and built images of version `>=1.3.0` include a small program (written in GO) that scans the `/repository.init/` directory for configurations of repositories. If you want a repository to be initialized at the first start, you have to define a subfolder (name is not relevant) in `/repository.init/`, and add a `config.ttl` to it. Ontotext wrote an [article](http://graphdb.ontotext.com/documentation/standard/configuring-a-repository.html) about how such  configuration file has to look like. A minimalistic example is shown below.
+Multiple repositories can be managed on the same GraphDB instances, and built images of version `>=1.3.0` include a small program (written in GO) that scans the `/repository.init/` directory for configurations of repositories. If you want a repository to be initialized at the first start, you have to define a subfolder (name is not relevant) in `/repository.init/`, and add a `config.ttl` to it. Ontotext wrote an [article](http://graphdb.ontotext.com/documentation/standard/configuring-a-repository.html) about how such a configuration file has to look like. A minimalistic example is shown below.
 
 ```
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
@@ -65,16 +63,21 @@ wikidata/
 
 After an successful initialization an `init.lock` file is added to the corresponding repository folder. If you want to re-initialize a repository, you can delete this lock and run a new container.
 
-The following command organizes the `/repository.init/` as in the example above.
+# SPARQL Prequerying
+
+After version `>=1.3.3` our Docker image also include a small Go program that scans recursively for all files with the file ending `.sparql` in folders of the directory `/repository.init/`. The program is going to send those queries to the running GraphDB instance, if they have not been sent to it before. The programs knows whether it has been sent before by checking the `sparql.lock` file in the corresponding folder of the repository. This lock file contains a list of all queries that have been successfully sent to the GraphDB instance. 
+
+## Full-Text-Search Use Case
+
+You want to automatically create a FTS index after the repository has been created and data has been loaded into it. A FTS is created in GraphDB by issuing an update query with your configuration. Ontotext wrote in their [article](http://graphdb.ontotext.com/documentation/free/full-text-search.html) about all the options that you can configure.
+
+You would create the update query for the FTS index and place it in the folder of the corresponding repository. Considering the example above for the repository initialization, it can look like this.
+
 ```
-    docker run --name graphdb-instance-name -d -p 127.0.0.1:7200:7200 \
-		-e GDB_HEAP_SIZE="16G" \
-		-v ./dbpedia/:/repository.init/dbpedia/ \
-		-v ./dbpedia-download/":/repository.init/dbpedia/toLoad \
-		-v ./wikidata/:/repository.init/wikidata/ \
-		-v ./wikidata-download/":/repository.init/wikidata/toLoad \
-		khaller/graphdb-free:1.2-graphdb8.11.0
-		--
+dbpedia/
+├── config.ttl
+├── fts-m2-index.sparql
+└── toLoad
 ```
 
 # Where to store your data?
@@ -95,3 +98,13 @@ The -v /my/own/graphdb-home:/opt/graphdb/data part of the command mounts the /my
 Note that users on host systems with SELinux enabled may see issues with this. The current workaround is to assign the relevant SELinux policy type to the new data directory so that the container will be allowed to access it:
 
 `chcon -Rt svirt_sandbox_file_t /my/own/graphdb-home`
+
+# Administrative Details
+
+## Feedback & Contributions
+
+Feel free to submit bugs and features with using the ticket manager of Github.
+
+## Contact
+
+* Kevin Haller - [kevin.haller@tuwien.ac.at](mailto:kevin.haller@tuwien.ac.at)
