@@ -65,17 +65,20 @@ func InitRepository(repositoryDirectory string) bool {
                     return true
                 } else {
                     fmt.Printf("%s Error: Execution of preload command failed. %s\n", LogPrefix, err.Error())
+                    return false
                 }
             } else {
                 fmt.Printf("%s Error: Could not find config.ttl for '%s'. %s\n", LogPrefix, repositoryDirectory,
                     err.Error())
+                return false
             }
         } else {
             fmt.Printf("%s Error: config.ttl must exist for initializing a repository, but does not exists for '%v' \n",
                 LogPrefix, repositoryDirectory)
+            return false
         }
     } else {
         fmt.Printf("%s ----- %s. ALREADY INITIALIZED -----\n", LogPrefix, repositoryDirectory)
+        return true
     }
-    return false
 }
