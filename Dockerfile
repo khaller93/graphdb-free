@@ -35,7 +35,10 @@ RUN go mod vendor && \
 # -----------------------------------------------
 FROM openjdk:11-jre-slim
 
-RUN apt-get update && apt-get install iproute2 -y
+RUN apt-get update && \
+	apt-get install -y --no-install-recommends \
+		iproute2 && \
+	rm -rf /var/lib/apt/lists/*
 
 LABEL maintainer="Kevin Haller <contact@kevinhaller.dev,kevin.haller@tuwien.ac.at>"
 
@@ -50,7 +53,7 @@ RUN mkdir -p /opt/graphdb
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 COPY --from=GoCompiler /binaries/* /usr/local/bin/
 
-ARG DFILE_VERSION="1.3.4"
+ARG DFILE_VERSION="1.3.5"
 ARG GDB_VERSION
 
 LABEL version="${DFILE_VERSION}-graphdb${GDB_VERSION}"
