@@ -1,4 +1,4 @@
-DFILE_VERSION=1.3.4
+DFILE_VERSION=1.3.5
 CONTAINER_REPO_NAME="docker.io/khaller"
 
 build:
@@ -17,5 +17,5 @@ push:
 
 as-latest:
 	@[ "${GDB_VERSION}" ] || ( echo "error: variable 'GDB_VERSION' is not set."; exit 1 )
-	docker tag "${CONTAINER_REPO_NAME}/graphdb-free:${GDB_VERSION}" -t "${CONTAINER_REPO_NAME}/graphdb-free"
-	docker push "${CONTAINER_REPO_NAME}/graphdb-free"
+	docker tag "${CONTAINER_REPO_NAME}/graphdb-free:${GDB_VERSION}" "${CONTAINER_REPO_NAME}/graphdb-free"
+	docker push "${CONTAINER_REPO_NAME}/graphdb-free" 
