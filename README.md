@@ -108,6 +108,25 @@ Note that users on host systems with SELinux enabled may see issues with this. T
 * `/opt/graphdb/conf` - Configuration Files
 * `/opt/graphdb/log` - Logging Files
 
+# Hardware Requirements
+
+The stated minimal requirements for running a GraphDB instance are 2GB of RAM and 2GB of disk space unless the loaded RDF dataset has less than 50 millionen triples. It is probably recommended to have at least 4G of free RAM. A table of recommendations is shown below.
+
+* **#Triples** are the planned number of explicit statements.
+* **RAM** is the recommended free RAM required for the loaded dataset with ***#Triples***.
+* **Disk Space** is the recommended free storage on disk requried to store the loaded dataset with ***#Triples***.
+
+| **#Triples** | **RAM** | **Disk Space** |
+| ------------ | ------- | -------------- |
+| 100M         | 4GB     | 12GB           |
+| 200M         | 8GB     | 24GB           |
+| 500M         | 20GB    | 60GB           |
+| 1B           | 34GB    | 120GB          |
+| 2B           | 38GB    | 240GB          |
+| 5B           | 49GB    | 600GB          |
+| 10B          | 68GB    | 1200GB         |
+| 20B          | 105GB   | 2400GB         |
+
 # Administration
 
 ### Feedback & Contributions
