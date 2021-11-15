@@ -1,46 +1,21 @@
-LATEST=9.3.2
+DFILE_VERSION=1.3.4
+CONTAINER_REPO_NAME="docker.io/khaller"
 
-latest:
-	./build.sh "9.3.3"
+build:
+	@[ "${GDB_VERSION}" ] || ( echo "error: variable 'GDB_VERSION' is not set."; exit 1 )
+	docker build --pull \
+		--build-arg GDB_VERSION="${GDB_VERSION}" \
+		--build-arg DFILE_VERSION="${DFILE_VERSION}" \
+		-t "${CONTAINER_REPO_NAME}/graphdb-free:${DFILE_VERSION}-graphdb${GDB_VERSION}" \
+		-t "${CONTAINER_REPO_NAME}/graphdb-free:${GDB_VERSION}" \
+		.
 
-9.3.3:
-	./build.sh "9.3.3"
+push:
+	@[ "${GDB_VERSION}" ] || ( echo "error: variable 'GDB_VERSION' is not set."; exit 1 )
+	docker push "${CONTAINER_REPO_NAME}/graphdb-free:${DFILE_VERSION}-graphdb${GDB_VERSION}"
+	docker push "${CONTAINER_REPO_NAME}/graphdb-free:${GDB_VERSION}"
 
-9.3.2:
-	./build.sh "9.3.2"
-
-9.3.1:
-	./build.sh "9.3.1"
-
-9.3.0:
-	./build.sh "9.3.0"
-
-9.2.1:
-	./build.sh "9.2.1"
-
-9.2.0:
-	./build.sh "9.2.0"
-
-9.1.1:
-	./build.sh "9.1.1"
-
-9.1.0:
-	./build.sh "9.1.0"
-
-9.0.0:
-	./build.sh "9.0.0"
-
-8.11.1:
-	./build.sh "8.11.1"
-
-8.11.0:
-	./build.sh "8.11.0"
-
-8.10.1:
-	./build.sh "8.10.1"
-
-8.10.0:
-	./build.sh "8.10.0"
-
-8.9.0:
-	./build.sh "8.9.0"
+as-latest:
+	@[ "${GDB_VERSION}" ] || ( echo "error: variable 'GDB_VERSION' is not set."; exit 1 )
+	docker tag "${CONTAINER_REPO_NAME}/graphdb-free:${GDB_VERSION}" -t "${CONTAINER_REPO_NAME}/graphdb-free"
+	docker push "${CONTAINER_REPO_NAME}/graphdb-free"

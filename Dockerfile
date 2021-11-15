@@ -1,3 +1,15 @@
+# ---------------------------------------------
+#  Extracting the GraphDB distribution
+# ---------------------------------------------
+FROM alpine:3.12 AS ZipExtractor
+
+ARG GDB_VERSION
+
+RUN apk add unzip
+COPY "dist/graphdb-free-${GDB_VERSION}-dist.zip" dist/
+RUN unzip -q "./dist/graphdb-free-${GDB_VERSION}-dist.zip" && \
+		mkdir -p /opt && mv "graphdb-free-${GDB_VERSION}" /opt/graphdb
+
 # ----------------------------------------------
 #  Repository/SPARQL Initialization GoCompiler
 # ----------------------------------------------
@@ -18,37 +30,33 @@ RUN go mod vendor && \
 	go build && \
 	mv repo-presparql-query /binaries/repo-presparql-query
 
-# --------------------
-#     Main Image
-# --------------------
-FROM openjdk:11-buster
+# -----------------------------------------------
+#  Main Image
+# -----------------------------------------------
+FROM openjdk:11-jre-slim
 
-RUN apt -qq update && apt install -qq unzip -y
+RUN apt-get update && apt-get install iproute2 -y
 
-# entrypoint shell script for starting GraphDB
-COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-# move the executables binaries from the compilation over
-COPY --from=GoCompiler /binaries/* /usr/local/bin/
+LABEL maintainer="Kevin Haller <contact@kevinhaller.dev,kevin.haller@tuwien.ac.at>"
 
-ARG DFILE_VERSION="1.3.3"
-ARG GDB_VERSION
-
-LABEL maintainer="Kevin Haller <keivn.haller@outofbits.com>"
-LABEL version="${DFILE_VERSION}-graphdb${GDB_VERSION}"
-LABEL description="Fresh new instance of GraphDB ${GDB_VERSION} (free version)."
-
-# install GraphDB
-COPY dist/graphdb-free-${GDB_VERSION}-dist.zip dist/
-RUN unzip -q ./dist/graphdb-free-${GDB_VERSION}-dist.zip && \
-		mkdir -p /opt && mv graphdb-free-${GDB_VERSION} /opt/graphdb && \
-		rm -rf dist
-
-# Volumes for runtime data
 VOLUME /opt/graphdb/data
 VOLUME /opt/graphdb/log
 VOLUME /opt/graphdb/conf
 VOLUME /opt/graphdb/work
 
+EXPOSE 7200
+
+RUN mkdir -p /opt/graphdb
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+COPY --from=GoCompiler /binaries/* /usr/local/bin/
+
+ARG DFILE_VERSION="1.3.4"
+ARG GDB_VERSION
+
+LABEL version="${DFILE_VERSION}-graphdb${GDB_VERSION}"
+LABEL description="Fresh new instance of GraphDB ${GDB_VERSION} (free version)."
+
+COPY --from=ZipExtractor /opt/graphdb /opt/graphdb
+
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-EXPOSE 7200
