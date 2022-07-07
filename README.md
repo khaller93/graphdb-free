@@ -2,9 +2,11 @@
 
 Ontotext doesn't provide Docker images for the free version of GraphDB. Although, a Dockerfile for the free version can be found on their [Github](https://github.com/Ontotext-AD/graphdb-docker). The Dockerfile in this repository is slightly different. A small program is executed before the start of the GraphDB instance that checks whether repositories shall be initialized. Moreover, another small program scans for SPARQL queries in the initialization folder and sends them to the GraphDB instance at the first startup. This could be useful for automatically creating a FTS index. Sections below are elaborating on these features.
 
-**PS: Should it be a problem that I publish these docker images, please simply contact me.**
-
 Already built images for use can be found [here](https://hub.docker.com/repository/docker/khaller/graphdb-free).
+
+**PS: Should it be a problem that I publish these docker images, please simply [contact me](#contact).**
+
+An example of how to use this container image can be seen in the `docker-compose.yml` file of our [Pokémon Playground](https://gitlab.tuwien.ac.at/kevin.haller/pokemon-playground).
 
 ## Building
 
@@ -12,23 +14,25 @@ The Dockerfile expects the GraphDB binaries to be located in the `dist` director
 
 ## Building a fresh image
 
-The Dockerfile is simple, it only expects you to pass the version of the GraphDB binaries for which you want to build the image. Download the corresponding binaries, move them into the `dist` directory and build the image with the following command (replace 8.11.0 with your version):
+The Dockerfile is simple, it only expects you to pass the version of the GraphDB binaries for which you want to build the image. Download the corresponding binaries, move them into the `dist` directory and build the image with the following command (replace 10.0.0 with your version):
 
-`docker build --build-arg GDB_VERSION="9.10.0" -t khaller/graphdb-free:9.10.0 .`
+`docker build --build-arg GDB_VERSION="10.0.0" -t khaller/graphdb-free:10.0.0 .`
 
 ## Running
 
 The image can be run as following. 
 
-`docker run -p 127.0.0.1:7200:7200 --name graphdb-instance-name -t khaller/graphdb-free:9.10.0`
+`docker run -p 127.0.0.1:7200:7200 --name graphdb-instance-name -t khaller/graphdb-free:10.0.0`
 
 You can pass arguments to the GraphDB server such as the heap size or `-s` for making it run in server mode.
 
-`docker run -p 127.0.0.1:7200:7200 --name graphdb-instance-name -t khaller/graphdb-free:9.10.0 -s --GDB_HEAP_SIZE=12G`
+`docker run -p 127.0.0.1:7200:7200 --name graphdb-instance-name -t khaller/graphdb-free:10.0.0 -s --GDB_HEAP_SIZE=12G`
 
 ## Repository Initialization
 
 Multiple repositories can be managed on the same GraphDB instances, and built images of version `>=1.3.0` include a small program (written in GO) that scans the `/repository.init/` directory for configurations of repositories. If you want a repository to be initialized at the first start, you have to define a subfolder (name is not relevant) in `/repository.init/`, and add a `config.ttl` to it. Ontotext wrote an [article](http://graphdb.ontotext.com/documentation/standard/configuring-a-repository.html) about how such a configuration file has to look like. A minimalistic example is shown below.
+
+**<span style="color:#f03c15">Hint:</span>** *With GraphDB >=10, the repository type `graphdb:FreeSailRepository` was replaced by `graphdb:SailRepository`, and the sail type `graphdb:FreeSail` was replaced by `graphdb:SailRepository`.*
 
 ```
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
@@ -41,16 +45,16 @@ Multiple repositories can be managed on the same GraphDB instances, and built im
     rep:repositoryID "dbpedia" ;
     rdfs:label "DBPedia" ;
     rep:repositoryImpl [
-        rep:repositoryType "graphdb:FreeSailRepository";
+        rep:repositoryType "graphdb:SailRepository";
         sr:sailImpl [
-            sail:sailType "graphdb:FreeSail" ;
+            sail:sailType "graphdb:Sail" ;
             owlim:entity-index-size "100000000" ;
         ]
 
     ].
 ```
 
-Optionally, data that must be preloaded can be added to the `toLoad` directory of the corresponding repository folder in a format that is supported by the [PreLoad Tool](http://graphdb.ontotext.com/documentation/standard/loading-data-using-preload.html) of the given GraphDB version. The [PreLoad Tool](http://graphdb.ontotext.com/documentation/standard/loading-data-using-preload.html) can handle GZip compressed files.
+Optionally, data that must be preloaded can be added to the `toLoad` directory of the corresponding repository folder in a format that is supported by the [Importrdf/PreLoad Tool](https://graphdb.ontotext.com/documentation/10.0/loading-data-using-importrdf.html) of the given GraphDB version. The [Importrdf/PreLoad Tool](https://graphdb.ontotext.com/documentation/10.0/loading-data-using-importrdf.html) can handle GZip compressed files.
 
 The organization of the `/repository.init/` could look like this, and the small program would initialize both of those repositories and preload the data.
 
@@ -67,13 +71,15 @@ After an successful initialization an `init.lock` file is added to the correspon
 
 ## SPARQL Prequerying
 
-After version `>=1.3.3` our Docker image also include a small Go program that scans recursively for all files with the file ending `.sparql` in folders of the directory `/repository.init/`. The program is going to send those queries to the running GraphDB instance, if they have not been sent to it before. The programs knows whether it has been sent before by checking the `sparql.lock` file in the corresponding folder of the repository. This lock file contains a list of all queries that have been successfully sent to the GraphDB instance. 
+After version `>=1.3.3` our Docker image also include a small Go program that scans recursively for all files with the file ending `.sparql` in folders of the directory `/repository.init/`. The program is going to send those queries to the running GraphDB instance, if they have not been sent to it before. The programs knows whether it has been sent before by checking the `sparql.lock` file in the corresponding folder of the repository. This lock file contains a list of all queries that have been successfully sent to the GraphDB instance.
 
 ### Full-Text-Search Use Case
 
-You want to automatically create a FTS index after the repository has been created and data has been loaded into it. A FTS is created in GraphDB by issuing an update query with your configuration. Ontotext wrote in their [article](http://graphdb.ontotext.com/documentation/free/full-text-search.html) about all the options that you can configure.
+You want to automatically create a FTS index after the repository has been created and data has been loaded into it. A FTS is created in GraphDB by issuing an update query with your configuration. Ontotext wrote in their [article](https://graphdb.ontotext.com/documentation/10.0/general-full-text-search-with-connectors.html) about all the options that you can configure.
 
 You would create the update query for the FTS index and place it in the folder of the corresponding repository. Considering the example above for the repository initialization, it can look like this.
+
+**<span style="color:#f03c15">Hint:</span>** *The syntax for configuring a FTS index has changed with GraphDB >=9.9.*
 
 ```
 dbpedia/
