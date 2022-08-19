@@ -33,7 +33,7 @@ RUN go mod vendor && \
 # -----------------------------------------------
 #  Main Image
 # -----------------------------------------------
-FROM openjdk:11-jre-slim
+FROM openjdk:11-jdk-slim
 
 RUN apt-get update && \
 	apt-get install -y --no-install-recommends \
