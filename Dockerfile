@@ -37,7 +37,7 @@ RUN rm -rf /opt/go/app
 # -----------------------------------------------
 #  Main Image
 # -----------------------------------------------
-FROM openjdk:11-jre-slim
+FROM openjdk:11-jdk-slim
 
 LABEL maintainer="Kevin Haller <contact@kevinhaller.dev>"
 
