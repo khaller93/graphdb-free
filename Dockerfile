@@ -59,7 +59,7 @@ RUN apt-get update \
 		iproute2 \
 	&& rm -rf /var/lib/apt/lists/*
 
-ARG DFILE_VERSION="1.4.0"
+ARG DFILE_VERSION="1.4.1"
 ARG GDB_VERSION
 
 LABEL version="${DFILE_VERSION}-graphdb${GDB_VERSION}"
