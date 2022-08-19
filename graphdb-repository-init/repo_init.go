@@ -30,6 +30,41 @@ func dExists(name string) bool {
 	}
 }
 
+// assembleToLoadFolderPath assembles the path to the toLoad folder
+// as it is required for the preload tool.
+func assembleToLoadFolderPath(repositoryDirectory string) string {
+	toLoadFolder := filepath.Join(repositoryDirectory, "toLoad")
+	if dExists(toLoadFolder) {
+		var toLoadFolder, err = filepath.Abs(toLoadFolder)
+		if err == nil {
+			return toLoadFolder
+		} else {
+			fmt.Printf("%s Warning: Couldn't create absolute path to folder '%s': %s\n",
+				LogPrefix, repositoryDirectory, err.Error())
+		}
+	} else {
+		fmt.Printf("%s Warning: Couldn't find data to load for '%s'. 'toLoad' is missing.\n",
+			LogPrefix, repositoryDirectory)
+	}
+	p := "/tmp/graphdb/toLoad"
+	err := os.MkdirAll(p, os.ModeDir)
+	if err != nil {
+		fmt.Printf("%s Warning: Couldn't create temporary folder '%s': %s\n",
+			LogPrefix, p, err.Error())
+	}
+	return p
+}
+
+// cleanTemporaryLoadFolder cleans the temporary folder, if it has been created.
+func cleanTemporaryLoadFolder(toLoadFolder string) {
+	if toLoadFolder == "/tmp/graphdb/toLoad" {
+		err := os.RemoveAll("/tmp/graphdb/toLoad")
+		if err != nil {
+			fmt.Printf("%s Warning: Couldn't delete temporary 'toLoad' folder. %s\n", LogPrefix, err.Error())
+		}
+	}
+}
+
 // InitRepository initializes the repository configured in the given directory. returns true,
 // if the repository could be initialized, otherwise false.
 func InitRepository(repositoryDirectory string) bool {
@@ -47,16 +82,8 @@ func InitRepository(repositoryDirectory string) bool {
 					"--partial-load",
 					"--force",
 				}
-				toLoadFolder := filepath.Join(repositoryDirectory, "toLoad")
-				if dExists(toLoadFolder) {
-					absToLoadFolder, err := filepath.Abs(toLoadFolder)
-					if err == nil {
-						args = append(args, absToLoadFolder)
-					}
-				} else {
-					fmt.Printf("%s Warning: Could not find data to load for '%s'. 'toLoad' is missing.\n",
-						LogPrefix, repositoryDirectory)
-				}
+				toLoadFolder := assembleToLoadFolderPath(repositoryDirectory)
+				args = append(args, toLoadFolder)
 				// command execution
 				cmd := exec.Command(PreloadTool, args...)
 				cmd.Stdout = os.Stdout
@@ -68,23 +95,23 @@ func InitRepository(repositoryDirectory string) bool {
 						fmt.Printf("%s Error: Failed to write the lock for a new initialization. %s",
 							LogPrefix, err.Error())
 					}
+					cleanTemporaryLoadFolder(toLoadFolder)
 					return true
 				} else {
-					fmt.Printf("%s Error: Execution of preload command failed. %s\n", LogPrefix, err.Error())
-					return false
+					fmt.Printf("%s Error: Execution of %s command failed. %s\n", LogPrefix, PreloadTool,
+						err.Error())
+					cleanTemporaryLoadFolder(toLoadFolder)
 				}
 			} else {
 				fmt.Printf("%s Error: Could not find config.ttl for '%s'. %s\n", LogPrefix, repositoryDirectory,
 					err.Error())
-				return false
 			}
 		} else {
 			fmt.Printf("%s Error: config.ttl must exist for initializing a repository, but does not exists for '%v' \n",
 				LogPrefix, repositoryDirectory)
-			return false
 		}
-	} else {
-		fmt.Printf("%s ----- %s. ALREADY INITIALIZED -----\n", LogPrefix, repositoryDirectory)
-		return true
+		return false
 	}
+	fmt.Printf("%s ----- %s. ALREADY INITIALIZED -----\n", LogPrefix, repositoryDirectory)
+	return true
 }

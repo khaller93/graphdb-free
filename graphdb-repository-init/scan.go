@@ -13,7 +13,8 @@ func Scan(directoryPath string) ([]string, error) {
 	if err == nil {
 		for _, f := range files {
 			if f.IsDir() {
-				repoFolders = append(repoFolders, filepath.Join(directoryPath, f.Name()))
+				repoFolders = append(repoFolders, filepath.Join(directoryPath,
+					f.Name()))
 			}
 		}
 	}
