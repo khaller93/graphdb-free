@@ -2,40 +2,72 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strings"
 )
 
 const LogPrefix string = "[REPO INIT]"
 
-func printUsage() {
+var (
+	InfoLogger    *log.Logger
+	WarningLogger *log.Logger
+	ErrorLogger   *log.Logger
+)
+
+func init() {
+	InfoLogger = log.New(os.Stdout, LogPrefix+"[INFO ] ", log.Ldate|log.Ltime)
+	WarningLogger = log.New(os.Stdout, LogPrefix+"[WARN ] ", log.Ldate|log.Ltime)
+	ErrorLogger = log.New(os.Stdout, LogPrefix+"[ERROR] ", log.Ldate|log.Ltime)
+}
+
+// printUsage prints a usage message with the specified error message. If the given error
+// message is an empty string, then the error line will be omitted.
+func printUsage(errorMsg string) {
+	errorLine := ""
+	if errorMsg != "" {
+		errorLine = fmt.Sprintf("error: %s\n", errorMsg)
+	}
 	appName := "graphdb-repository-init"
 	if len(os.Args) > 0 {
 		appName = os.Args[0]
 	}
-	fmt.Printf("%s <repos-init-directory>\n", appName)
+	fmt.Printf("%s\nusage:\n\t%s <repos-init-directory>\n", errorLine, appName)
+}
+
+// initializeRepositories initializes the given array of repository folders. An error
+// will be returned, if one of the initializations failed.
+func initializeRepositories(repoFolders []string) error {
+	for _, repoFolder := range repoFolders {
+		err := InitRepository(repoFolder)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func main() {
-	if len(os.Args) == 2 {
-		fmt.Printf("%s Starting to check whether repositories need to be initialized.\n", LogPrefix)
-		directoryPath := os.Args[1]
-		repoFolders, err := Scan(directoryPath)
-		if err == nil {
-			fmt.Printf("%s Detected following repository folders: [%s].\n", LogPrefix,
-				strings.Join(repoFolders, ","))
-			for _, repoFolder := range repoFolders {
-				success := InitRepository(repoFolder)
-				if !success {
-					os.Exit(1)
-				}
-			}
+	n := len(os.Args)
+	if n != 2 {
+		if n < 2 {
+			printUsage("not enough arguments specified")
 		} else {
-			fmt.Printf("%s Could not check the subfolders of directory '%s'. %s\n", LogPrefix, directoryPath,
-				err.Error())
+			printUsage("too many arguments specified")
 		}
-	} else {
-		printUsage()
+		os.Exit(1)
+	}
+	InfoLogger.Printf("starting to check whether repositories need to be initialized\n")
+	repoFolders, err := Scan(os.Args[1])
+	if err != nil {
+		ErrorLogger.Printf("couldn't check subfolders of directory '%s'", os.Args[1])
+		os.Exit(1)
+	}
+	InfoLogger.Printf("detected following repository folders: [%s]\n",
+		strings.Join(repoFolders, ","))
+	err = initializeRepositories(repoFolders)
+	if err != nil {
+		ErrorLogger.Printf(err.Error())
 		os.Exit(1)
 	}
 }
