@@ -40,15 +40,18 @@ func assembleToLoadFolderPath(repositoryDirectory string) string {
 		if err == nil {
 			return absToLoadFolder
 		} else {
-			WarningLogger.Printf("couldn't create absolute path to '%s': %s", toLoadFolder, err.Error())
+			WarningLogger.Printf("couldn't create absolute path to '%s': %s",
+				toLoadFolder, err.Error())
 		}
 	} else {
-		WarningLogger.Printf("couldn't find data to load in '%s' for '%s'", toLoadFolder, repositoryDirectory)
+		WarningLogger.Printf("couldn't find data to load in '%s' for '%s'",
+			toLoadFolder, repositoryDirectory)
 	}
 	p := "/tmp/graphdb/toLoad"
 	err := os.MkdirAll(p, os.ModeDir)
 	if err != nil {
-		WarningLogger.Printf("couldn't create temporary folder '%s': %s", p, err.Error())
+		WarningLogger.Printf("couldn't create temporary folder '%s': %s",
+			p, err.Error())
 	}
 	return p
 }
@@ -63,8 +66,8 @@ func constructArgs(repositoryDirectory string, toLoadFolder string) ([]string, e
 	}
 	absConfigPath, err := filepath.Abs(configPath)
 	if err != nil {
-		return nil, fmt.Errorf("abosulute path to config.ttl couldn't be built for '%s': %s", repositoryDirectory,
-			err.Error())
+		return nil, fmt.Errorf("abosulute path to config.ttl couldn't be built for '%s': %s",
+			repositoryDirectory, err.Error())
 	}
 	return []string{
 		"load",
@@ -81,17 +84,19 @@ func cleanTemporaryLoadFolder(toLoadFolder string) {
 	if toLoadFolder == "/tmp/graphdb/toLoad" {
 		err := os.RemoveAll("/tmp/graphdb/toLoad")
 		if err != nil {
-			WarningLogger.Printf("couldn't delete temporary 'toLoad' folder: %s", err.Error())
+			WarningLogger.Printf("couldn't delete temporary 'toLoad' folder: %s",
+				err.Error())
 		}
 	}
 }
 
-// InitRepository initializes the repository configured in the given directory. returns true,
-// if the repository could be initialized, otherwise false.
+// InitRepository initializes the repository configured in the given directory.
+// Returns true, if the repository could be initialized, otherwise false.
 func InitRepository(repositoryDirectory string) error {
 	InfoLogger.Printf("----- CHECK %s. -----\n", repositoryDirectory)
 	if fExists(filepath.Join(repositoryDirectory, "init.lock")) {
-		InfoLogger.Printf("----- %s. ALREADY INITIALIZED -----\n", repositoryDirectory)
+		InfoLogger.Printf("----- %s. ALREADY INITIALIZED -----\n",
+			repositoryDirectory)
 		return nil
 	}
 	toLoadFolder := assembleToLoadFolderPath(repositoryDirectory)
@@ -105,9 +110,11 @@ func InitRepository(repositoryDirectory string) error {
 	err = cmd.Run()
 	if err != nil {
 		cleanTemporaryLoadFolder(toLoadFolder)
-		return fmt.Errorf("execution of '%s %s' failed: %s", PreloadTool, strings.Join(args, " "), err.Error())
+		return fmt.Errorf("execution of '%s %s' failed: %s", PreloadTool,
+			strings.Join(args, " "), err.Error())
 	}
-	err = ioutil.WriteFile(filepath.Join(repositoryDirectory, "init.lock"), []byte("locked"), 0644)
+	err = ioutil.WriteFile(filepath.Join(repositoryDirectory, "init.lock"),
+		[]byte("locked"), 0644)
 	if err != nil {
 		WarningLogger.Printf("failed to write lock file for successful initialization of '%s': %s",
 			repositoryDirectory, err.Error())

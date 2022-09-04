@@ -21,8 +21,8 @@ func init() {
 	ErrorLogger = log.New(os.Stdout, LogPrefix+"[ERROR] ", log.Ldate|log.Ltime)
 }
 
-// printUsage prints a usage message with the specified error message. If the given error
-// message is an empty string, then the error line will be omitted.
+// printUsage prints a usage message with the specified error message. If the
+// given error message is an empty string, then the error line will be omitted.
 func printUsage(errorMsg string) {
 	errorLine := ""
 	if errorMsg != "" {
@@ -32,11 +32,12 @@ func printUsage(errorMsg string) {
 	if len(os.Args) > 0 {
 		appName = os.Args[0]
 	}
-	fmt.Printf("%s\nusage:\n\t%s <repos-init-directory>\n", errorLine, appName)
+	fmt.Printf("%s\nusage:\n\t%s <repos-init-directory>\n", errorLine,
+		appName)
 }
 
-// initializeRepositories initializes the given array of repository folders. An error
-// will be returned, if one of the initializations failed.
+// initializeRepositories initializes the given array of repository folders. An
+// error will be returned, if one of the initializations failed.
 func initializeRepositories(repoFolders []string) error {
 	for _, repoFolder := range repoFolders {
 		err := InitRepository(repoFolder)
@@ -57,13 +58,14 @@ func main() {
 		}
 		os.Exit(1)
 	}
-	InfoLogger.Printf("starting to check whether repositories need to be initialized\n")
+	InfoLogger.Printf("starting to check whether repositories need to be initialized")
 	repoFolders, err := Scan(os.Args[1])
 	if err != nil {
-		ErrorLogger.Printf("couldn't check subfolders of directory '%s'", os.Args[1])
+		ErrorLogger.Printf("couldn't check subfolders of directory '%s'",
+			os.Args[1])
 		os.Exit(1)
 	}
-	InfoLogger.Printf("detected following repository folders: [%s]\n",
+	InfoLogger.Printf("detected following repository folders: [%s]",
 		strings.Join(repoFolders, ","))
 	err = initializeRepositories(repoFolders)
 	if err != nil {
