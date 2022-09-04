@@ -12,26 +12,6 @@ import (
 
 const PreloadTool string = "importrdf"
 
-// fExists checks whether a file exists at the given path.
-func fExists(name string) bool {
-	stat, err := os.Stat(name)
-	if err != nil {
-		return !os.IsNotExist(err)
-	} else {
-		return !stat.IsDir()
-	}
-}
-
-// dExists checks whether a directory exists at the given path.
-func dExists(name string) bool {
-	stat, err := os.Stat(name)
-	if err != nil {
-		return !os.IsNotExist(err)
-	} else {
-		return stat.IsDir()
-	}
-}
-
 // assembleToLoadFolderPath assembles the path to the toLoad folder
 // as it is required for the preload tool.
 func assembleToLoadFolderPath(repositoryDirectory string) string {

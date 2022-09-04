@@ -58,11 +58,15 @@ func main() {
 		}
 		os.Exit(1)
 	}
+	repositoryInitDirectoryPath := os.Args[1]
+	if !dExists(repositoryInitDirectoryPath) {
+		os.Exit(0)
+	}
 	InfoLogger.Printf("starting to check whether repositories need to be initialized")
-	repoFolders, err := Scan(os.Args[1])
+	repoFolders, err := Scan(repositoryInitDirectoryPath)
 	if err != nil {
 		ErrorLogger.Printf("couldn't check subfolders of directory '%s'",
-			os.Args[1])
+			repositoryInitDirectoryPath)
 		os.Exit(1)
 	}
 	InfoLogger.Printf("detected following repository folders: [%s]",
