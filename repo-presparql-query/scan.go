@@ -17,7 +17,8 @@ func ScanForRepositories(directoryPath string) ([]string, error) {
 	if err == nil {
 		for _, f := range files {
 			if f.IsDir() {
-				repoFolders = append(repoFolders, filepath.Join(directoryPath, f.Name()))
+				repoFolders = append(repoFolders, filepath.Join(directoryPath,
+					f.Name()))
 			}
 		}
 	}
@@ -28,16 +29,17 @@ func ScanForRepositories(directoryPath string) ([]string, error) {
 // '.sparql' and returns a list of paths to them.
 func ScanForSPARQLFiles(repositoryPath string) ([]string, error) {
 	sparqlFiles := make([]string, 0)
-	err := filepath.Walk(repositoryPath, func(path string, info os.FileInfo, err error) error {
-		if err == nil {
-			if !info.IsDir() {
-				match := sparqlFileRegex.MatchString(path)
-				if match {
-					sparqlFiles = append(sparqlFiles, path)
+	err := filepath.Walk(repositoryPath,
+		func(path string, info os.FileInfo, err error) error {
+			if err == nil {
+				if !info.IsDir() {
+					match := sparqlFileRegex.MatchString(path)
+					if match {
+						sparqlFiles = append(sparqlFiles, path)
+					}
 				}
 			}
-		}
-		return err
-	})
+			return err
+		})
 	return sparqlFiles, err
 }
