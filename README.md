@@ -30,7 +30,7 @@ You can pass arguments to the GraphDB server such as the heap size or `-s` for m
 
 ## Repository Initialization
 
-Multiple repositories can be managed on the same GraphDB instances, and built images of version `>=1.3.0` include a small program (written in GO) that scans the `/repository.init/` directory for configurations of repositories. If you want a repository to be initialized at the first start, you have to define a subfolder (name is not relevant) in `/repository.init/`, and add a `config.ttl` to it. Ontotext wrote an [article](http://graphdb.ontotext.com/documentation/standard/configuring-a-repository.html) about how such a configuration file has to look like. A minimalistic example is shown below.
+Multiple repositories can be managed on the same GraphDB instance, and images of version `>=1.3.0` include a small program (written in GO) that scans the `/repository.init/` directory for configurations of repositories. If you want a repository to be initialized, you have to define a subfolder (name is not relevant) in `/repository.init/`, and add a `config.ttl` to it. Ontotext wrote an [article](http://graphdb.ontotext.com/documentation/standard/configuring-a-repository.html) about how such a configuration file has to look like. A minimalistic example is shown below.
 
 **<span style="color:#f03c15">Hint:</span>** *With GraphDB >=10, the repository type `graphdb:FreeSailRepository` was replaced by `graphdb:SailRepository`, and the sail type `graphdb:FreeSail` was replaced by `graphdb:SailRepository`.*
 
@@ -54,7 +54,7 @@ Multiple repositories can be managed on the same GraphDB instances, and built im
     ].
 ```
 
-Optionally, data that must be preloaded can be added to the `toLoad` directory of the corresponding repository folder in a format that is supported by the [Importrdf/PreLoad Tool](https://graphdb.ontotext.com/documentation/10.0/loading-data-using-importrdf.html) of the given GraphDB version. The [Importrdf/PreLoad Tool](https://graphdb.ontotext.com/documentation/10.0/loading-data-using-importrdf.html) can handle GZip compressed files.
+Optionally, data that must be preloaded can be added to the `toLoad` directory of the corresponding repository folder in a format that is supported by the [Importrdf/PreLoad Tool](https://graphdb.ontotext.com/documentation/10.0/loading-data-using-importrdf.html) of the given GraphDB version. The [Importrdf/PreLoad Tool](https://graphdb.ontotext.com/documentation/10.0/loading-data-using-importrdf.html) can handle GZip compressed files. Per default, the arguments `--force` and `--partial-load` are specified for the preloading tool. The passed arguments can be overwritten by defining a `PRELOAD_ARGS` environment variable (e.g. `-e PRELOAD_ARGS="-m parallel --force"`).
 
 The organization of the `/repository.init/` could look like this, and the small program would initialize both of those repositories and preload the data.
 

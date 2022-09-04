@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/mattn/go-shellwords"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -69,14 +70,24 @@ func constructArgs(repositoryDirectory string, toLoadFolder string) ([]string, e
 		return nil, fmt.Errorf("abosulute path to config.ttl couldn't be built for '%s': %s",
 			repositoryDirectory, err.Error())
 	}
-	return []string{
+	args := []string{
 		"load",
 		"-c",
 		absConfigPath,
-		"--partial-load",
-		"--force",
-		toLoadFolder,
-	}, nil
+	}
+	preloadCommandArgs := os.Getenv("PRELOAD_ARGS")
+	if preloadCommandArgs != "" {
+		envArgs, err := shellwords.Parse(preloadCommandArgs)
+		if err != nil {
+			return nil, fmt.Errorf("the command line arguments of 'PRELOAD_ARGS' couldn't be parsed: %s",
+				err.Error())
+		}
+		args = append(args, envArgs...)
+	} else {
+		args = append(args, "--partial-load", "--force")
+	}
+	args = append(args, toLoadFolder)
+	return args, nil
 }
 
 // cleanTemporaryLoadFolder cleans the temporary folder, if it has been created.
