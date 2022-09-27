@@ -51,7 +51,9 @@ VOLUME /opt/graphdb/work
 EXPOSE 7200
 EXPOSE 7300
 
-COPY docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
+COPY start-entrypoint.sh /usr/bin/start-entrypoint
+COPY run-graphdb.sh /usr/bin/run-graphdb
+
 COPY --from=GoCompiler /binaries/* /usr/bin/
 
 RUN apt-get update \
@@ -67,4 +69,4 @@ LABEL description="Fresh new instance of GraphDB ${GDB_VERSION} (free version)."
 
 COPY --from=ZipExtractor /opt/graphdb /opt/graphdb
 
-ENTRYPOINT ["docker-entrypoint.sh"]
+ENTRYPOINT ["start-entrypoint"]
