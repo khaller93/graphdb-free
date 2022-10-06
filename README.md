@@ -141,5 +141,5 @@ Feel free to submit bugs and features on our [Github repository](https://github.
 
 ### Contact
 
-* Kevin Haller - [contact@kevinhaller.dev](mailto:contact@kevinhaller.dev) or [kevin.haller@tuwien.ac.at](mailto:kevin.haller@tuwien.ac.at)
+* Kevin Haller - [contact@kevinhaller.dev](mailto:contact@kevinhaller.dev)
 
