@@ -6,7 +6,7 @@ Already built images for use can be found [here](https://hub.docker.com/reposito
 
 **PS: Should it be a problem that I publish these docker images, please simply [contact me](#contact).**
 
-An example of how to use this container image can be seen in the `docker-compose.yml` file of our [Pokémon Playground](https://gitlab.tuwien.ac.at/kevin.haller/pokemon-playground).
+An example of how to use this container image can be seen in the `docker-compose.yml` file of our [Pokémon Playground](https://github.com/pokemon-kg/ontotext-graphdb-playground).
 
 ## Building
 
