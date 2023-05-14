@@ -51,12 +51,16 @@ VOLUME /opt/graphdb/work
 EXPOSE 7200
 EXPOSE 7300
 
+COPY set-ownership.sh /usr/bin/set-ownership
+COPY run-graphdb.sh /usr/bin/run-graphdb
 COPY docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
 COPY --from=GoCompiler /binaries/* /usr/bin/
 
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
+		gosu \
 		iproute2 \
+		tini \
 	&& rm -rf /var/lib/apt/lists/*
 
 ARG DFILE_VERSION="1.4.1"
