@@ -1,7 +1,16 @@
 #!/bin/sh
 set -e
 
-graphdb-repository-init "/repository.init"
-repo-presparql-query "/repository.init" &
+USER="${GDB_USER:=root}"
 
-exec graphdb "$@"
+if [ "$USER" != "root" -a "$USER" != "0" ]; then
+  if [ $(expr "$USER" : "^[0-9]*$") -eq 0 ]; then
+    USER_PWD=$(cat /etc/passwd | grep -e "^$USER:" || true)
+    if [ -z "$USER_PWD" ]; then
+      adduser --no-create-home --disabled-password --gecos '' $USER
+    fi
+  fi
+  set-ownership $USER
+fi
+
+exec tini -g gosu -- $USER run-graphdb "$@"

@@ -14,19 +14,39 @@ The Dockerfile expects the GraphDB binaries to be located in the `dist` director
 
 ## Building a fresh image
 
-The Dockerfile is simple, it only expects you to pass the version of the GraphDB binaries for which you want to build the image. Download the corresponding binaries, move them into the `dist` directory and build the image with the following command (replace 10.0.0 with your version):
+The Dockerfile is simple, it only expects you to pass the version of the GraphDB binaries for which you want to build the image. Download the corresponding binaries, move them into the `dist` directory and build the image with the following command (replace 10.2.1 with your version):
 
-`docker build --build-arg GDB_VERSION="10.0.0" -t khaller/graphdb-free:10.0.0 .`
+```bash
+docker build --build-arg GDB_VERSION="10.2.1" -t khaller/graphdb-free:10.2.1 .
+```
 
 ## Running
 
 The image can be run as following. 
 
-`docker run -p 127.0.0.1:7200:7200 --name graphdb-instance-name -t khaller/graphdb-free:10.0.0`
+```bash
+docker run -p 127.0.0.1:7200:7200 --name graphdb-instance-name -t khaller/graphdb-free:10.2.1
+```
 
 You can pass arguments to the GraphDB server such as the heap size or `-s` for making it run in server mode.
 
-`docker run -p 127.0.0.1:7200:7200 --name graphdb-instance-name -t khaller/graphdb-free:10.0.0 -s --GDB_HEAP_SIZE=12G`
+```bash
+docker run -p 127.0.0.1:7200:7200 --name graphdb-instance-name -t khaller/graphdb-free:10.2.1 -s --GDB_HEAP_SIZE=12G
+```
+
+## Rootless Run
+
+The container will by default start with the `root` user, but you might want to drop the execution to a less privileged user. You can choose the user (UID number or name) by setting the `GDB_USER` environment variable. With the command below, the GraphDB instance is run with the `nobody` user.
+
+```bash
+docker run -p 7200:7200 --name rootless-graphdb -e GDB_USER=nobody -t khaller/graphdb-free:10.2.1
+```
+
+The first regular user on your Linux host system has usually the uid of `1000`. You can get the uid of your host user with `id -u`. If you want GraphDB to run on the same user, then you have to set `GDB_USER` to the proper uid. The container doesn't know the created users on your host system, so you can't specify the name of your host user.
+
+```bash
+docker run -p 7200:7200 --name rootless-graphdb -e GDB_USER=1000 -t khaller/graphdb-free:10.2.1
+```
 
 ## Repository Initialization
 
