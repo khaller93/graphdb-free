@@ -63,7 +63,7 @@ RUN apt-get update \
 		tini \
 	&& rm -rf /var/lib/apt/lists/*
 
-ARG DFILE_VERSION="1.4.1"
+ARG DFILE_VERSION
 ARG GDB_VERSION
 
 LABEL version="${DFILE_VERSION}-graphdb${GDB_VERSION}"

@@ -1,4 +1,4 @@
-DFILE_VERSION=1.4.1
+DFILE_VERSION=`git tag | tail -n 1 | tr -d '\nv'`
 CONTAINER_REPO_NAME="docker.io/khaller"
 
 build:
