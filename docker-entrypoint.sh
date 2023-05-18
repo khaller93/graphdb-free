@@ -13,6 +13,7 @@ if [ "$USER" != "root" -a "$USER" != "0" ]; then
   set-ownership $USER
 fi
 
+mkdir -p /repository.init
 mkdir -p /tmp/graphdb/toLoad
 
 exec tini -g gosu -- $USER run-graphdb "$@"
