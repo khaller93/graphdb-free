@@ -8,7 +8,5 @@ fi
 USER=$1
 
 chown $USER -R /opt/graphdb
-
-if [ -d "/repository.init" ]; then
-  chown $USER -R /repository.init || true
-fi
+chown $USER -R /tmp/toLoad.tmp || true
+chown $USER -R /repository.init --quiet || true

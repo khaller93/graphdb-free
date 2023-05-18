@@ -46,23 +46,13 @@ func assembleToLoadFolderPath(repositoryDirectory string) string {
 		fmt.Printf("%s Warning: Couldn't find data to load for '%s'. 'toLoad' is missing.\n",
 			LogPrefix, repositoryDirectory)
 	}
-	p := "/tmp/graphdb/toLoad"
+	p := "/tmp/toLoad.tmp"
 	err := os.MkdirAll(p, os.ModeDir)
 	if err != nil {
 		fmt.Printf("%s Warning: Couldn't create temporary folder '%s': %s\n",
 			LogPrefix, p, err.Error())
 	}
 	return p
-}
-
-// cleanTemporaryLoadFolder cleans the temporary folder, if it has been created.
-func cleanTemporaryLoadFolder(toLoadFolder string) {
-	if toLoadFolder == "/tmp/graphdb/toLoad" {
-		err := os.RemoveAll("/tmp/graphdb/toLoad")
-		if err != nil {
-			fmt.Printf("%s Warning: Couldn't delete temporary 'toLoad' folder. %s\n", LogPrefix, err.Error())
-		}
-	}
 }
 
 // InitRepository initializes the repository configured in the given directory. returns true,
@@ -95,12 +85,10 @@ func InitRepository(repositoryDirectory string) bool {
 						fmt.Printf("%s Error: Failed to write the lock for a new initialization. %s",
 							LogPrefix, err.Error())
 					}
-					cleanTemporaryLoadFolder(toLoadFolder)
 					return true
 				} else {
 					fmt.Printf("%s Error: Execution of %s command failed. %s\n", LogPrefix, PreloadTool,
 						err.Error())
-					cleanTemporaryLoadFolder(toLoadFolder)
 				}
 			} else {
 				fmt.Printf("%s Error: Could not find config.ttl for '%s'. %s\n", LogPrefix, repositoryDirectory,
