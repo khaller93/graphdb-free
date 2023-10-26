@@ -53,7 +53,7 @@ RUN mkdir -p /opt/graphdb
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 COPY --from=GoCompiler /binaries/* /usr/local/bin/
 
-ARG DFILE_VERSION="1.3.5"
+ARG DFILE_VERSION="1.3.6"
 ARG GDB_VERSION
 
 LABEL version="${DFILE_VERSION}-graphdb${GDB_VERSION}"

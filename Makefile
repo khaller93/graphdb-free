@@ -1,4 +1,4 @@
-DFILE_VERSION=1.3.5
+DFILE_VERSION=1.3.6
 CONTAINER_REPO_NAME="docker.io/khaller"
 
 build:
