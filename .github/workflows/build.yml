@@ -1,16 +1,22 @@
 on:
-  workflow_dispatch:
-    inputs:
-      dockerfileVersion:
-        required: true
-        type: string
-        default: 1.5.1
-      graphdbVersion:
-        required: true
-        type: string
-      latest:
-        required: true
-        type: boolean
+#   workflow_dispatch:
+#     inputs:
+#       dockerfileVersion:
+#         required: true
+#         type: string
+#         default: 1.5.1
+#       graphdbVersion:
+#         required: true
+#         type: string
+#       latest:
+#         required: true
+#         type: boolean
+  push:
+
+env:
+  dockerfileVersion: 1.5.1
+  graphdbVersion: 10.5.0
+  latest: true
 
 jobs:
     build-amd64:
@@ -29,7 +35,11 @@ jobs:
         - name: Checkout the tag
           run: |
             git fetch --all
-            git checkout v${{ inputs.dockerfileVersion }}
+            git checkout v${{ env.dockerfileVersion }}
+        
+        - name: Get GraphDB source
+          run: |
+            wget ${{ env.GRAPHDB_HTTP_DIR }}/graphdb-${{ env.graphdbVersion }}-dist.zip
 
         - name: Build and push
           uses: docker/build-push-action@v5
@@ -38,8 +48,8 @@ jobs:
             no-cache: true
             push: true
             pull: true
-            tags: "khaller/graphdb-free-test:${{ inputs.dockerfileVersion }}-graphdb${{ inputs.graphdbVersion }}_amd64"
+            tags: "khaller/graphdb-free-test:${{ env.dockerfileVersion }}-graphdb${{ env.graphdbVersion }}_amd64"
             build-args: |
-              GDB_VERSION=${{ inputs.graphdbVersion }}
-              DFILE_VERSION=${{ inputs.dockerfileVersion }}
+              GDB_VERSION=${{ env.graphdbVersion }}
+              DFILE_VERSION=${{ env.dockerfileVersion }}
 
