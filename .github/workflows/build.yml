@@ -39,7 +39,7 @@ jobs:
         
         - name: Get GraphDB source
           run: |
-            wget ${{ env.GRAPHDB_HTTP_DIR }}/graphdb-${{ env.graphdbVersion }}-dist.zip
+            cd dist && wget ${{ vars.GRAPHDB_HTTP_DIR }}/graphdb-${{ env.graphdbVersion }}-dist.zip
 
         - name: Build and push
           uses: docker/build-push-action@v5
