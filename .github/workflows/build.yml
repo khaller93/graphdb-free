@@ -1,22 +1,16 @@
 on:
-#   workflow_dispatch:
-#     inputs:
-#       dockerfileVersion:
-#         required: true
-#         type: string
-#         default: 1.5.1
-#       graphdbVersion:
-#         required: true
-#         type: string
-#       latest:
-#         required: true
-#         type: boolean
-  push:
-
-env:
-  dockerfileVersion: 1.5.1
-  graphdbVersion: 10.5.0
-  latest: false
+  workflow_dispatch:
+    inputs:
+      dockerfileVersion:
+        required: true
+        type: string
+        default: 1.5.1
+      graphdbVersion:
+        required: true
+        type: string
+      latest:
+        required: true
+        type: boolean
 
 jobs:
 
@@ -36,11 +30,11 @@ jobs:
       - name: Checkout the tag
         run: |
           git fetch --all
-          git checkout v${{ env.dockerfileVersion }}
+          git checkout v${{ inputs.dockerfileVersion }}
         
       - name: Get GraphDB source
         run: |
-          cd dist && wget ${{ vars.GRAPHDB_HTTP_DIR }}/graphdb-${{ env.graphdbVersion }}-dist.zip
+          cd dist && wget ${{ vars.GRAPHDB_HTTP_DIR }}/graphdb-${{ inputs.graphdbVersion }}-dist.zip
 
       - name: Build and push
         uses: docker/build-push-action@v5
@@ -49,10 +43,10 @@ jobs:
           no-cache: true
           push: true
           pull: true
-          tags: "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ env.dockerfileVersion }}-graphdb${{ env.graphdbVersion }}_amd64"
+          tags: "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ inputs.dockerfileVersion }}-graphdb${{ inputs.graphdbVersion }}_amd64"
           build-args: |
-            GDB_VERSION=${{ env.graphdbVersion }}
-            DFILE_VERSION=${{ env.dockerfileVersion }}
+            GDB_VERSION=${{ inputs.graphdbVersion }}
+            DFILE_VERSION=${{ inputs.dockerfileVersion }}
 
   
     build-arm64:
@@ -71,11 +65,11 @@ jobs:
       - name: Checkout the tag
         run: |
           git fetch --all
-          git checkout v${{ env.dockerfileVersion }}
+          git checkout v${{ inputs.dockerfileVersion }}
                 
       - name: Get GraphDB source
         run: |
-          cd dist && wget ${{ vars.GRAPHDB_HTTP_DIR }}/graphdb-${{ env.graphdbVersion }}-dist.zip
+          cd dist && wget ${{ vars.GRAPHDB_HTTP_DIR }}/graphdb-${{ inputs.graphdbVersion }}-dist.zip
         
       - name: Build and push
         uses: docker/build-push-action@v5
@@ -84,10 +78,10 @@ jobs:
           no-cache: true
           push: true
           pull: true
-          tags: "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ env.dockerfileVersion }}-graphdb${{ env.graphdbVersion }}_arm64"
+          tags: "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ inputs.dockerfileVersion }}-graphdb${{ inputs.graphdbVersion }}_arm64"
           build-args: |
-            GDB_VERSION=${{ env.graphdbVersion }}
-            DFILE_VERSION=${{ env.dockerfileVersion }}
+            GDB_VERSION=${{ inputs.graphdbVersion }}
+            DFILE_VERSION=${{ inputs.dockerfileVersion }}
 
 
     create-manifest:
@@ -103,19 +97,19 @@ jobs:
 
       - name: Create manifest with complete tag
         run: |
-          docker manifest create "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ env.dockerfileVersion }}-graphdb${{ env.graphdbVersion }}" "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ env.dockerfileVersion }}-graphdb${{ env.graphdbVersion }}_amd64" "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ env.dockerfileVersion }}-graphdb${{ env.graphdbVersion }}_arm64"
-          docker manifest push --purge "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ env.dockerfileVersion }}-graphdb${{ env.graphdbVersion }}"
+          docker manifest create "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ inputs.dockerfileVersion }}-graphdb${{ inputs.graphdbVersion }}" "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ inputs.dockerfileVersion }}-graphdb${{ inputs.graphdbVersion }}_amd64" "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ inputs.dockerfileVersion }}-graphdb${{ inputs.graphdbVersion }}_arm64"
+          docker manifest push --purge "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ inputs.dockerfileVersion }}-graphdb${{ inputs.graphdbVersion }}"
       
       - name: Create manifest with short tag
         run: |
-          docker manifest create "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ env.graphdbVersion }}" "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ env.dockerfileVersion }}-graphdb${{ env.graphdbVersion }}_amd64" "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ env.dockerfileVersion }}-graphdb${{ env.graphdbVersion }}_arm64"
-          docker manifest push --purge "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ env.graphdbVersion }}"
+          docker manifest create "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ inputs.graphdbVersion }}" "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ inputs.dockerfileVersion }}-graphdb${{ inputs.graphdbVersion }}_amd64" "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ inputs.dockerfileVersion }}-graphdb${{ inputs.graphdbVersion }}_arm64"
+          docker manifest push --purge "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ inputs.graphdbVersion }}"
       
       - name: Set tag as latest
-        if: ${{ env.latest == 'true' }}
+        if: ${{ inputs.latest == 'true' }}
         run: |
-          docker pull "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ env.graphdbVersion }}"
-          docker tag "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ env.graphdbVersion }}" "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:latest"
+          docker pull "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ inputs.graphdbVersion }}"
+          docker tag "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ inputs.graphdbVersion }}" "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:latest"
           docker push "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:latest"
 
 
