@@ -14,10 +14,9 @@ on:
   push:
 
 env:
-  repositoryName: khaller/graphdb-free-test
   dockerfileVersion: 1.5.1
   graphdbVersion: 10.5.0
-  latest: true
+  latest: false
 
 jobs:
 
