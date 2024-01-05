@@ -113,7 +113,7 @@ jobs:
           docker manifest push --purge "${{ env.repositoryName }}:${{ env.graphdbVersion }}"
       
       - name: Set tag as latest
-        if: env.latest == true
+        if: ${{ env.latest == 'true' }}
         run: |
           docker pull "${{ env.repositoryName }}:${{ env.graphdbVersion }}"
           docker tag "${{ env.repositoryName }}:${{ env.graphdbVersion }}" "${{ env.repositoryName }}:latest"
