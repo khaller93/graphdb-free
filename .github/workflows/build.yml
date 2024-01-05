@@ -106,7 +106,7 @@ jobs:
           docker manifest push --purge "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ inputs.graphdbVersion }}"
       
       - name: Set tag as latest
-        if: ${{ inputs.latest == 'true' }}
+        if: ${{ inputs.latest }}
         run: |
           docker pull "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ inputs.graphdbVersion }}"
           docker tag "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ inputs.graphdbVersion }}" "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:latest"
