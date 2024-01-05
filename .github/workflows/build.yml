@@ -14,6 +14,7 @@ on:
   push:
 
 env:
+  repositoryName: khaller/graphdb-free-test
   dockerfileVersion: 1.5.1
   graphdbVersion: 10.5.0
   latest: true
@@ -49,7 +50,7 @@ jobs:
           no-cache: true
           push: true
           pull: true
-          tags: "khaller/graphdb-free-test:${{ env.dockerfileVersion }}-graphdb${{ env.graphdbVersion }}_amd64"
+          tags: "${{ env.repositoryName }}:${{ env.dockerfileVersion }}-graphdb${{ env.graphdbVersion }}_amd64"
           build-args: |
             GDB_VERSION=${{ env.graphdbVersion }}
             DFILE_VERSION=${{ env.dockerfileVersion }}
@@ -84,7 +85,7 @@ jobs:
           no-cache: true
           push: true
           pull: true
-          tags: "khaller/graphdb-free-test:${{ env.dockerfileVersion }}-graphdb${{ env.graphdbVersion }}_arm64"
+          tags: "${{ env.repositoryName }}:${{ env.dockerfileVersion }}-graphdb${{ env.graphdbVersion }}_arm64"
           build-args: |
             GDB_VERSION=${{ env.graphdbVersion }}
             DFILE_VERSION=${{ env.dockerfileVersion }}
@@ -100,5 +101,22 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Create manifest with complete tag
+        run: |
+          docker manifest create "${{ env.repositoryName }}:${{ env.dockerfileVersion }}-graphdb${{ env.graphdbVersion }}" "${{ env.repositoryName }}:${{ env.dockerfileVersion }}-graphdb${{ env.graphdbVersion }}_amd64" "${{ env.repositoryName }}:${{ env.dockerfileVersion }}-graphdb${{ env.graphdbVersion }}_arm64"
+          docker manifest push --purge "${{ env.repositoryName }}:${{ env.dockerfileVersion }}-graphdb${{ env.graphdbVersion }}"
+      
+      - name: Create manifest with short tag
+        run: |
+          docker manifest create "${{ env.repositoryName }}:${{ env.graphdbVersion }}" "${{ env.repositoryName }}:${{ env.dockerfileVersion }}-graphdb${{ env.graphdbVersion }}_amd64" "${{ env.repositoryName }}:${{ env.dockerfileVersion }}-graphdb${{ env.graphdbVersion }}_arm64"
+          docker manifest push --purge "${{ env.repositoryName }}:${{ env.graphdbVersion }}"
+      
+      - name: Set tag as latest
+        if: env.latest == true
+        run: |
+          docker pull "${{ env.repositoryName }}:${{ env.graphdbVersion }}"
+          docker tag "${{ env.repositoryName }}:${{ env.graphdbVersion }}" "${{ env.repositoryName }}:latest"
+          docker push "${{ env.repositoryName }}:latest"
 
 
