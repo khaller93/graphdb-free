@@ -19,11 +19,11 @@ env:
   latest: true
 
 jobs:
+
     build-amd64:
       name: Build GraphDB container for 64/AMD64
       runs-on: [self-hosted, "X64"]
       steps:
-
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -54,11 +54,11 @@ jobs:
             GDB_VERSION=${{ env.graphdbVersion }}
             DFILE_VERSION=${{ env.dockerfileVersion }}
 
+  
     build-arm64:
       name: Build GraphDB container for arm64
       runs-on: [self-hosted, "arm64"]
       steps:
-
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -88,4 +88,17 @@ jobs:
           build-args: |
             GDB_VERSION=${{ env.graphdbVersion }}
             DFILE_VERSION=${{ env.dockerfileVersion }}
+
+
+    create-manifest:
+      name: Creates manifest for GraphDB container
+      runs-on: [self-hosted]
+      needs: [build-amd64, build-arm64]
+      steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
 
