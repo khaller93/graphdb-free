@@ -8,11 +8,9 @@ on:
       graphdbVersion:
         required: true
         type: string
-        default:
       latest:
         required: true
         type: boolean
-  push:
 
 jobs:
 
