@@ -8,9 +8,11 @@ on:
       graphdbVersion:
         required: true
         type: string
+        default:
       latest:
         required: true
         type: boolean
+  push:
 
 jobs:
 
@@ -29,7 +31,7 @@ jobs:
 
       - name: Checkout the tag
         run: |
-          git fetch --all
+          git fetch --tags
           git checkout v${{ inputs.dockerfileVersion }}
         
       - name: Get GraphDB source
