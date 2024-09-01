@@ -1,7 +1,7 @@
 # ---------------------------------------------
 #  Extracting the GraphDB distribution
 # ---------------------------------------------
-FROM alpine:3.12 AS ZipExtractor
+FROM alpine:3.20 AS ZipExtractor
 
 ARG GDB_VERSION
 
@@ -14,9 +14,13 @@ RUN unzip -q "./dist/graphdb-${GDB_VERSION}-dist.zip" \
 # ----------------------------------------------
 #  Repository/SPARQL Initialization GoCompiler
 # ----------------------------------------------
-FROM golang:1.18-buster AS GoCompiler
+FROM oraclelinux:9 AS GoCompiler
 
 RUN mkdir -p /binaries
+
+RUN yum install go -y \ 
+	&& yum clean all \
+	&& rm -rf /var/cache/yum
 
 # compiles program that initializes GraphDB repositories
 COPY graphdb-repository-init /opt/go/app/graphdb-repository-init
@@ -37,7 +41,7 @@ RUN rm -rf /opt/go/app
 # -----------------------------------------------
 #  Main Image
 # -----------------------------------------------
-FROM openjdk:11-jdk-slim
+FROM oraclelinux:9
 
 LABEL maintainer="Kevin Haller <contact@kevinhaller.dev>"
 
@@ -56,12 +60,10 @@ COPY run-graphdb.sh /usr/bin/run-graphdb
 COPY docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
 COPY --from=GoCompiler /binaries/* /usr/bin/
 
-RUN apt-get update \
-	&& apt-get install -y --no-install-recommends \
-		gosu \
-		iproute2 \
-		tini \
-	&& rm -rf /var/lib/apt/lists/*
+RUN yum install -y java-11-openjdk-devel epel-release \
+	&& yum install tini \
+	&& yum clean all \
+	&& rm -rf /var/cache/yum
 
 ARG DFILE_VERSION
 ARG GDB_VERSION
