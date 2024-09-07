@@ -2,16 +2,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/knakk/rdf"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"time"
+
+	"github.com/knakk/rdf"
+	"github.com/shirou/gopsutil/net"
 )
 
 // fExists checks whether a file exists at the given path.
@@ -153,18 +153,13 @@ func writeInitializedQueries(repositoryPath string, queries []string) error {
 }
 
 func getGraphDBAddress() (string, error) {
-	cmd := exec.Command("ss", "-tulpn")
-	out, err := cmd.Output()
-	if err == nil {
-		ssOut := string(out)
-		tabRegex := regexp.MustCompile(`\s+`)
-		for _, line := range strings.Split(ssOut, "\n") {
-			if strings.Contains(line, "\"java\"") {
-				tabs := tabRegex.Split(line, -1)
-				if len(tabs) >= 4 {
-					return tabs[4], nil
-				}
-			}
+	connections, err := net.Connections("tcp6")
+	if err != nil {
+		return "", err
+	}
+	for _, conn := range connections {
+		if conn.Status == "LISTEN" && conn.Laddr.Port != 7300 {
+			return fmt.Sprintf("localhost:%v", conn.Laddr.Port), nil
 		}
 	}
 	return "", err
