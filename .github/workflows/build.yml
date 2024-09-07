@@ -108,8 +108,7 @@ jobs:
       - name: Set tag as latest
         if: ${{ inputs.latest }}
         run: |
-          docker pull "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ inputs.graphdbVersion }}"
-          docker tag "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ inputs.graphdbVersion }}" "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:latest"
-          docker push "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:latest"
+          docker manifest create "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ inputs.graphdbVersion }}" "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ inputs.dockerfileVersion }}-graphdb${{ inputs.graphdbVersion }}_amd64" "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:${{ inputs.dockerfileVersion }}-graphdb${{ inputs.graphdbVersion }}_arm64"
+          docker manifest push --purge "${{ vars.DOCKERHUB_REPOSITORY_NAME }}:latest"
 
 
