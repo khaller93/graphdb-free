@@ -1,37 +1,37 @@
 # Dockerfile for GraphDB (free version) 
 
-Ontotext doesn't provide Docker images for the free version of GraphDB. Although, a Dockerfile for the free version can be found on their [Github](https://github.com/Ontotext-AD/graphdb-docker). The Dockerfile in this repository is slightly different. A small program is executed before the start of the GraphDB instance that checks whether repositories shall be initialized. Moreover, another small program scans for SPARQL queries in the initialization folder and sends them to the GraphDB instance at the first startup. This could be useful for automatically creating a FTS index. Sections below are elaborating on these features.
+A Dockerfile for the free version of GraphDB is available on Ontotext’s [Github repository](https://github.com/Ontotext-AD/graphdb-docker). This Dockerfile includes a few enhancements beyond the standard setup. Before the GraphDB instance starts, a small program checks whether repositories should be initialized. Additionally, another utility scans the initialization folder for SPARQL queries and executes them against the GraphDB instance during its first startup. This feature can be particularly useful for automating tasks such as creating a full-text search (FTS) index. The sections below provide a detailed explanation of these features.
 
 Already built images for use can be found [here](https://hub.docker.com/repository/docker/khaller/graphdb-free).
 
 **PS: Should it be a problem that I publish these docker images, please simply [contact me](#contact).**
 
-An example of how to use this container image can be seen in the `docker-compose.yml` file of our [Pokémon Playground](https://github.com/pokemon-kg/ontotext-graphdb-playground).
+An example of how to use this container image can be seen in the `docker-compose.yml` file of [Pokémon Playground](https://github.com/pokemon-kg/ontotext-graphdb-playground).
 
 ## Building
 
-The Dockerfile expects the GraphDB binaries to be located in the `dist` directory in the form in which they are downloaded from Ontotext (as a zip file). However, this github repository doesn't provide them and you must download them on your own from the Ontotext website. If you want to download the latest GraphDB version, please go to the [Ontotext GraphDB website](https://www.ontotext.com/products/graphdb/) and fill out the form.
+The Dockerfile expects the GraphDB binaries to be placed in the `dist` directory, in the same ZIP format as provided by Ontotext. However, these binaries are not included in the GitHub repository and must be downloaded manually from the Ontotext website. To get the latest version of GraphDB, visit the [Ontotext GraphDB website](https://www.ontotext.com/products/graphdb/).
 
 ## Building a fresh image
 
-The Dockerfile is simple, it only expects you to pass the version of the GraphDB binaries for which you want to build the image. Download the corresponding binaries, move them into the `dist` directory and build the image with the following command (replace 10.2.1 with your version):
+The Dockerfile is straightforward; it only requires you to specify the version of the GraphDB you want to use when building the image.
 
 ```bash
-docker build --build-arg GDB_VERSION="10.2.1" -t khaller/graphdb-free:10.2.1 .
+docker build --build-arg GDB_VERSION="11.0.0" -t khaller/graphdb-free:11.0.0 .
 ```
 
 ## Running
 
-The image can be run as following. 
+The image can be run as follows. Starting with version 11.0.0, even the free edition of GraphDB requires a license key. This key must be mounted to `/opt/graphdb/conf/graphdb.license` when running the container.
 
 ```bash
-docker run -p 127.0.0.1:7200:7200 --name graphdb-instance-name -t khaller/graphdb-free:10.2.1
+docker run -v "$(pwd)/graphdb.license:/opt/graphdb/conf/graphdb.license" -p 7200:7200 --name graphdb-instance-name -t khaller/graphdb-free:11.0.0
 ```
 
 You can pass arguments to the GraphDB server such as the heap size or `-s` for making it run in server mode.
 
 ```bash
-docker run -p 127.0.0.1:7200:7200 --name graphdb-instance-name -t khaller/graphdb-free:10.2.1 -s --GDB_HEAP_SIZE=12G
+docker run -v "$(pwd)/graphdb.license:/opt/graphdb/conf/graphdb.license" -p 7200:7200 --name graphdb-instance-name -t khaller/graphdb-free:11.0.0 -s --GDB_HEAP_SIZE=12G
 ```
 
 ## Rootless Run
@@ -39,13 +39,13 @@ docker run -p 127.0.0.1:7200:7200 --name graphdb-instance-name -t khaller/graphd
 The container will by default start with the `root` user, but you might want to drop the execution to a less privileged user. You can choose the user (UID number or name) by setting the `GDB_USER` environment variable. With the command below, the GraphDB instance is run with the `nobody` user.
 
 ```bash
-docker run -p 7200:7200 --name rootless-graphdb -e GDB_USER=nobody -t khaller/graphdb-free:10.2.1
+docker run -v "$(pwd)/graphdb.license:/opt/graphdb/conf/graphdb.license" -p 7200:7200 --name rootless-graphdb -e GDB_USER=nobody -t khaller/graphdb-free:11.0.0
 ```
 
 The first regular user on your Linux host system has usually the uid of `1000`. You can get the uid of your host user with `id -u`. If you want GraphDB to run on the same user, then you have to set `GDB_USER` to the proper uid. The container doesn't know the created users on your host system, so you can't specify the name of your host user.
 
 ```bash
-docker run -p 7200:7200 --name rootless-graphdb -e GDB_USER=1000 -t khaller/graphdb-free:10.2.1
+docker run -v "$(pwd)/graphdb.license:/opt/graphdb/conf/graphdb.license" -p 7200:7200 --name rootless-graphdb -e GDB_USER=1000 -t khaller/graphdb-free:11.0.0
 ```
 
 ## Repository Initialization
@@ -157,7 +157,7 @@ The stated minimal requirements for running a GraphDB instance are 2GB of RAM an
 
 ### Feedback & Contributions
 
-Feel free to submit bugs and features on our [Github repository](https://github.com/khaller93/graphdb-free).
+Feel free to submit bugs and features for this Docker image.
 
 ### Contact
 
