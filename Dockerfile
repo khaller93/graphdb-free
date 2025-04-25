@@ -60,7 +60,7 @@ COPY run-graphdb.sh /usr/bin/run-graphdb
 COPY docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
 COPY --from=GoCompiler /binaries/* /usr/bin/
 
-RUN yum install -y java-11-openjdk-devel epel-release \
+RUN yum install -y java-21-openjdk-devel epel-release \
 	&& yum install tini \
 	&& yum clean all \
 	&& rm -rf /var/cache/yum

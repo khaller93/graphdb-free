@@ -1,6 +1,13 @@
 #!/bin/sh
 set -e
 
+if [ -f "/opt/graphdb/conf/graphdb.license" ]; then
+    echo "Using license file at /opt/graphdb/conf/graphdb.license"
+else
+    echo "error: Mount the license file to '/opt/graphdb/conf/graphdb.license'"
+    exit 1
+fi
+
 USER="${GDB_USER:=root}"
 
 mkdir -p /repository.init
